@@ -1,0 +1,49 @@
+import os
+import time
+import sys
+from PyQt5 import QtWidgets, QtGui
+
+class App(QtWidgets.QSystemTrayIcon):
+def init(self, parent=None):
+QtWidgets.QSystemTrayIcon.init(self, parent)
+
+# Создаем меню
+    self.menu = QtWidgets.QMenu()
+    
+    # Создаем кнопки меню
+    self.cloudflare1_action = QtWidgets.QAction("Cloudflare 1", self)
+    self.cloudflare1_action.triggered.connect(self.cloudflare1_function)
+    self.menu.addAction(self.cloudflare1_action)
+    
+    self.cloudflare2_action = QtWidgets.QAction("Cloudflare 2", self)
+    self.cloudflare2_action.triggered.connect(self.cloudflare2_function)
+    self.menu.addAction(self.cloudflare2_action)
+    
+    self.exit_action = QtWidgets.QAction("Выход", self)
+    self.exit_action.triggered.connect(self.exit_function)           
+    self.menu.addAction(self.exit_action)
+    
+    # Устанавливаем иконку трея
+    self.setIcon(QtGui.QIcon("icon.png"))
+    
+    # Показываем меню
+    self.setContextMenu(self.menu)
+    
+def cloudflare1_function(self):
+    os.system('start cmd /c cloudflared access rdp --hostname ставляем_свой_урл --url rdp://localhost:1111')
+    time.sleep(4)
+    os.system('start cmd /c mstsc /v:localhost:1111')
+    
+def cloudflare2_function(self):
+    os.system('start cmd /c cloudflared access ssh --hostname ставим_свой_урл --url ssh://localhost:22')
+    
+def exit_function(self):
+    self.setVisible(False)
+    QtWidgets.qApp.quit()
+    sys.exit()
+    
+    if name == 'main':
+app = QtWidgets.QApplication(sys.argv)
+myapp = App()
+myapp.show()
+sys.exit(app.exec_())
