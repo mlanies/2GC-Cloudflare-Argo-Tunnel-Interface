@@ -1,4 +1,4 @@
-#Cloudflare Zero Trust App Launcher
+# Cloudflare Zero Trust App Launcher
 Описание программы "Cloudflare Zero Trust App Launcher":
 
 "Cloudflare Zero Trust App Launcher" - это программа для запуска удаленных рабочих столов с использованием сервиса "Cloudflare Zero Trust". Она позволяет легко запускать удаленные рабочие столы, защищенные Cloudflare Access, и управлять списком серверов, которые можно подключить.
