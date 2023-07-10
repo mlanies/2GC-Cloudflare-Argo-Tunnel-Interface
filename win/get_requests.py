@@ -14,4 +14,3 @@ def get_projects_url(pattern:str="rdp") -> list:
     return [i['domain'] for i in response.json()['apps'] if pattern in i['domain'].lower()]
 
 
-print(get_projects_url())
