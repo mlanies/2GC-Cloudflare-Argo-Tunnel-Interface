@@ -1,113 +1,152 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMenu, QSystemTrayIcon, QAction, QDialog, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QListWidget, QMessageBox, QCheckBox
+
+from PyQt5.QtWidgets import QApplication, QMenu, QSystemTrayIcon, QAction, QWidget, QDialog, QVBoxLayout, QHBoxLayout, \
+    QListWidget, QMessageBox, QCheckBox
+from PyQt5.QtWidgets import QInputDialog
 from PyQt5.QtGui import QIcon
 
-class App(QDialog):
-    def __init__(self):
+from get_requests import get_projects_url
+
+
+class App(QWidget):
+    """
+    Класс приложения
+
+    """
+
+    def __init__(self) -> None:
+        """
+        инизализатор класса
+        Вызвыает инизиализатор родительского класса.
+        Задает изначальные параметры:
+            self.setWindowTitle : Заголовок окна
+        Создает изначальные виджеты:
+            self.tray_icon : Создание иконки в системном трее
+             self.menu : Меню программы.
+             self.url_list : Список юрлов
+
+        """
         super().__init__()
+        self.setWindowTitle('Server Manager')
 
-    # Создание иконки в системном трее
-    self.tray_icon = QSystemTrayIcon(self)
-    self.tray_icon.setIcon(QIcon('icon.png'))
-    self.tray_icon.setVisible(True)
-    self.tray_icon.setToolTip('Server Manager')
+        self.tray_icon = QSystemTrayIcon(self)
+        self.menu = QMenu(self)
+        self.url_list = QListWidget()
+        self.__pattern = "rdp"
 
-    # Создание контекстного меню для иконки
-    menu = QMenu(self)
-    
-    # Добавление действий в меню
-    enter_url = QAction("Ввести URL:", self)
-    enter_url.triggered.connect(self.show_url_dialog)
-    menu.addAction(enter_url)
+        self.autostart_checkbox = QCheckBox('Автозапуск программы', self)
+        self.setWindowTitle('Server Manager')
 
-    server_list = QAction("Список серверов", self)
-    server_list.triggered.connect(self.show_server_list)
-    menu.addAction(server_list)
+        # Добавление виджетов на форму
+        main_layout = QVBoxLayout()
+        main_layout.addWidget(self.url_list)
 
-    settings = QAction("Настройки", self)
-    settings.triggered.connect(self.show_settings)
-    menu.addAction(settings)
+        settings_layout = QHBoxLayout()
+        settings_layout.addWidget(self.autostart_checkbox)
+        main_layout.addLayout(settings_layout)
 
-    exit_action = QAction("Выход", self)
-    exit_action.triggered.connect(self.exit)
-    menu.addAction(exit_action)
+        self.setLayout(main_layout)
+        self.initUI()
 
-    self.tray_icon.setContextMenu(menu)
+    def initUI(self) -> None:
+        """
+        Метод для загрузки всех методов
+        :return:
+        """
+        self.show_icon()
+        self.set_menu()
 
-    # Создание других виджетов       
-    self.url_list = QListWidget()
-    self.autostart_checkbox = QCheckBox('Автозапуск программы', self)
-    self.setWindowTitle('Server Manager')
+    def show_icon(self) -> None:
+        """
+        Метод создает иконку в трее
+        :return:
+        """
+        self.tray_icon = QSystemTrayIcon(self)
+        self.tray_icon.setIcon(QIcon('images/icon.png'))
+        self.tray_icon.setVisible(True)
+        self.tray_icon.setToolTip('Server Manager')
 
-    # Добавление виджетов на форму
-    main_layout = QVBoxLayout()
-    main_layout.addWidget(self.url_list)
-    
-    settings_layout = QHBoxLayout()
-    settings_layout.addWidget(self.autostart_checkbox)
-    main_layout.addLayout(settings_layout)
+    def set_menu(self) -> None:
+        """
+        Метод для добавления меню
+        :return:
+        """
+        server_list = QAction("Список серверов", self)
+        server_list.triggered.connect(self.show_server_list)
+        self.menu.addAction(server_list)
 
-    self.setLayout(main_layout)
+        server_list = QAction("Изменить паттерн", self)
+        server_list.triggered.connect(self.set_pattern)
+        self.menu.addAction(server_list)
 
-def show_url_dialog(self):
-    # Создание диалогового окна для ввода URL
-    url_dialog = QDialog(self)
-    url_dialog.setWindowTitle('Введите URL')
-    url_dialog.setGeometry(100, 100, 50, 100)
+        exit_action = QAction("Выход", self)
+        exit_action.triggered.connect(self.exit)
+        self.menu.addAction(exit_action)
 
-    url_label = QLabel('URL:', url_dialog)
-    url_label.move(5, 5)
+        self.tray_icon.setContextMenu(self.menu)
 
-    url_edit = QLineEdit(url_dialog)
-    url_edit.move(5, 25)
+    def chech_urls(self, urls: list) -> bool:
+        """
+        Проверка наличия urls
+        :param urls: list список url
+        :return: bool Возращает True если удалось получить коректные url, в противном случае вызывает сообщение с ошибкой
+        """
+        if urls:
+            return True
+        self.get_message_box("Ошибочка", "Не найдено подходящих url")
+        return False
 
-    ok_button = QPushButton('OK', url_dialog)
-    ok_button.move(5, 45)
-    
-    # Обработчик нажатия на кнопку OK
-    ok_button.clicked.connect(lambda: self.add_url(url_edit.text(), url_dialog))
+    def get_message_box(self, title: str, message: str) -> None:
+        """
+        Методя для вывода предупреждающих сообщений
+        :param title: str Заголовок окна
+        :param message: str Сообщение с ошибкой
+        :return: None
+        """
+        msg = QMessageBox(self)
+        msg.setWindowTitle(title)
+        msg.setText(message)
+        msg.setDefaultButton(QMessageBox.Ok)
+        msg.exec_()
 
-    url_dialog.exec_()
+    def show_server_list(self) -> None:
+        """
+        Метод для добавления юрлов в меню
+        Получает urls из get_requests
+        Проверяет наличие хотя бы одного urla
+        :return: None
+        """
+        self.menu.clear()
+        urls = get_projects_url(self.__pattern)
+        if self.chech_urls(urls):
+            for url in urls:
+                server_url = self.menu.addMenu(f"{url}")
+                server_url.addAction("Включить")
+                server_url.addAction("Выключить")
+            self.set_menu()
 
-def add_url(self, url, url_dialog):
-    # Добавление URL в список
-    self.url_list.addItem(url)
-    url_dialog.hide()
+    def set_pattern(self):
+        """
+        Функция для изменения паттерна поиска приложений.
+        Создает диалоговое окно, которое запрашивает у пользователя новый паттерн
+        :return: None
+        """
+        dialog = QInputDialog(self)
+        dialog.setWindowTitle("Изменение паттерна сайта")
+        dialog.setLabelText("Введите новый паттерн")
+        dialog.setOkButtonText("Применить")
+        dialog.setCancelButtonText("Отмена")
+        if dialog.exec_() == QDialog.Accepted:
+            text = dialog.textValue()
+            self.__pattern = text
 
-def show_server_list(self):
-    # Получение выделенного URL из списка
-    selected_url = self.url_list.currentItem().text()
-    
-    # Генерация случайного номера порта от 1100 до 1200
-    port = random.randint(1100, 1200)
-
-    # Запуск команды cmd
-    cmd_command = f'cloudflared access rdp --hostname "{selected_url}-host" --url rdp://localhost:{port}'
-    os.system(cmd_command)
-
-    # Запуск команды mstsc
-    mstsc_command = f'start cmd /c mstsc /v:localhost:{port}'
-    os.system(mstsc_command)
-
-def show_settings(self):
-    # Создание диалогового окна для настроек
-    settings_dialog = QDialog(self)
-    settings_dialog.setWindowTitle('Настройки')
-    settings_dialog.setGeometry(100, 100, 300, 100)
-
-    autostart_layout = QHBoxLayout()
-    autostart_layout.addWidget(self.autostart_checkbox)
-
-    settings_dialog.setLayout(autostart_layout)
-    settings_dialog.exec_()
-
-def exit(self):
-    # Закрытие приложения
-    self.tray_icon.setVisible(False)
-    QApplication.quit()
+    def exit(self):
+        self.tray_icon.setVisible(False)
+        QApplication.quit()
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+    app.setQuitOnLastWindowClosed(False)
     ex = App()
     sys.exit(app.exec_())
