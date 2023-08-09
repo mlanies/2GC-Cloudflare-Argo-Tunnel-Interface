@@ -8,9 +8,10 @@ def get_projects_url(pattern:str="rdp") -> list:
     headers = {
         'Cookie': main()
     }
-
     response = requests.get(url, headers=headers)
-
-    return [i['domain'] for i in response.json()['apps'] if pattern in i['domain'].lower()]
+    try:
+        return [i['domain'] for i in response.json()['apps'] if pattern in i['domain'].lower()]
+    except Exception:
+        return False
 
 

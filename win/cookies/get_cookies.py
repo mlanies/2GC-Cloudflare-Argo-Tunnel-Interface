@@ -6,7 +6,7 @@ import shutil
 from datetime import datetime, timedelta
 import win32crypt
 from Crypto.Cipher import AES
-
+import tempfile
 
 
 def get_chrome_datetime(chromedate):
@@ -48,14 +48,22 @@ def decrypt_data(data, key):
 
 def main():
     cookies_info=''
-    db_path = os.path.join(os.environ["USERPROFILE"], "AppData", "Local", "Google", "Chrome", "User Data", "default")
+    db_path = os.path.join(os.environ["USERPROFILE"], "AppData", "Local", "Google", "Chrome", "User Data", "Default")
     if "Cookies" in os.listdir(db_path):
         db_path = os.path.join(db_path, "Cookies")
     else:
         db_path = os.path.join(db_path, "Network", "Cookies")
+
+    path_to_check = "C:\\Users\\v.sinitsky\\AppData\\Local\\Google\\Chrome\\User Data\\default\\Network\\Cookies"
+    exists = os.path.exists(path_to_check)
+
+    if exists:
+        print(f"Путь '{path_to_check}' существует.")
+    else:
+        print(f"Путь '{path_to_check}' не существует или недоступен.")
     filename = "Cookies.db"
     if not os.path.isfile(filename):
-        shutil.copyfile(db_path, filename)
+        shutil.copyfile(path_to_check, filename)
     db = sqlite3.connect(filename)
     cursor = db.cursor()
     cursor.execute("""
@@ -71,15 +79,15 @@ def main():
         if "eyJhdWQ" in decrypted_value or host_key == 'media108.cloudflareaccess.com':
             cookies_info += f"{name}={decrypted_value};"
 
-            # print(f"""
-            #    Host: {host_key}
-            #    Cookie name: {name}
-            #    Cookie value (decrypted): {decrypted_value}
-            #    Creation datetime (UTC): {get_chrome_datetime(creation_utc)}
-            #    Last access datetime (UTC): {get_chrome_datetime(last_access_utc)}
-            #    Expires datetime (UTC): {get_chrome_datetime(expires_utc)}
-            #    ===============================================================
-            #    """)
+            print(f"""
+               Host: {host_key}
+               Cookie name: {name}
+               Cookie value (decrypted): {decrypted_value}
+               Creation datetime (UTC): {get_chrome_datetime(creation_utc)}
+               Last access datetime (UTC): {get_chrome_datetime(last_access_utc)}
+               Expires datetime (UTC): {get_chrome_datetime(expires_utc)}
+               ===============================================================
+               """)
 
         cursor.execute("""
            UPDATE cookies SET value = ?, has_expires = 1, expires_utc = 99999999999999999, is_persistent = 1, is_secure = 0

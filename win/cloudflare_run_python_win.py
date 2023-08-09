@@ -6,7 +6,26 @@ from PyQt5.QtWidgets import QInputDialog
 from PyQt5.QtGui import QIcon
 
 from get_requests import get_projects_url
+from commands.create_command import connect_to_server
 
+
+class CopyableMessageBox(QMessageBox):
+    def __init__(self, parent=None):
+        super(CopyableMessageBox, self).__init__(parent)
+        print(14)
+        self.setIcon(QMessageBox.Information)
+        self.setWindowTitle("Ваши файлы куки устарели!")
+        self.setText("Выполните авторизацию на сайте\n"
+                                 "https://media108.cloudflareaccess.com/\n через гугл хром и попробуйте еще раз")
+        self.addButton(QMessageBox.Ok)
+        print(20)
+        self.addButton("Копировать url", QMessageBox.ActionRole)  # Добавляем кнопку "Копировать"
+
+    def exec_(self):
+        result = super(CopyableMessageBox, self).exec_()
+        if result == QMessageBox.ActionRole:  # Если была нажата кнопка "Копировать"
+            clipboard = QApplication.clipboard()
+            clipboard.setText("https://media108.cloudflareaccess.com")
 
 class App(QWidget):
     """
@@ -62,7 +81,7 @@ class App(QWidget):
         :return:
         """
         self.tray_icon = QSystemTrayIcon(self)
-        self.tray_icon.setIcon(QIcon('images/icon.png'))
+        self.tray_icon.setIcon(QIcon('images/icon2.png'))
         self.tray_icon.setVisible(True)
         self.tray_icon.setToolTip('Server Manager')
 
@@ -104,10 +123,13 @@ class App(QWidget):
         :return: None
         """
         msg = QMessageBox(self)
+        msg.setIcon(QMessageBox.Information)
         msg.setWindowTitle(title)
+
         msg.setText(message)
         msg.setDefaultButton(QMessageBox.Ok)
         msg.exec_()
+
 
     def show_server_list(self) -> None:
         """
@@ -118,12 +140,28 @@ class App(QWidget):
         """
         self.menu.clear()
         urls = get_projects_url(self.__pattern)
-        if self.chech_urls(urls):
-            for url in urls:
-                server_url = self.menu.addMenu(f"{url}")
-                server_url.addAction("Включить")
-                server_url.addAction("Выключить")
+        if urls:
+
+            if self.chech_urls(urls):
+
+                for url in urls:
+                    server_url = self.menu.addMenu(f"{url}")
+
+                    def make_lambda(u):
+                        return lambda checked, url=u: connect_to_server(url)
+
+                    action_enable = QAction("Включить", self)
+                    action_enable.triggered.connect(make_lambda(url))
+                    server_url.addAction(action_enable)
+
+                    # action_disable = QAction("Выключить", self)
+                    # action_disable.triggered.connect(make_lambda(url))
+                    # server_url.addAction(action_disable)
+                self.set_menu()
+        else:
+            msg = CopyableMessageBox().exec_()
             self.set_menu()
+
 
     def set_pattern(self):
         """
@@ -139,6 +177,7 @@ class App(QWidget):
         if dialog.exec_() == QDialog.Accepted:
             text = dialog.textValue()
             self.__pattern = text
+
 
     def exit(self):
         self.tray_icon.setVisible(False)
