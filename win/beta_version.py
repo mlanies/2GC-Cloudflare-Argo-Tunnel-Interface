@@ -3,13 +3,68 @@ import sys
 from typing import Any
 
 from PyQt5.QtWidgets import QApplication, QMenu, QSystemTrayIcon, QAction, QWidget, QDialog, QVBoxLayout, QListWidget, \
-    QMessageBox
+    QMessageBox, QDesktopWidget, QMenuBar, QMainWindow, QHBoxLayout, QPushButton, QLineEdit, QLabel, QGroupBox, \
+    QScrollArea
 from PyQt5.QtWidgets import QInputDialog
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QPixmap
 
 import subprocess
 import time
 import random
+from dotenv import load_dotenv
+
+from db.db_postg import PostgresDBConnect
+from db.db_sqlite import SqliteDBConnect
+from super_btn import Switch
+
+class MyWidget(QDialog):
+    def __init__(self, app):
+        super().__init__()
+        self.app = app
+        self.initUI()
+        self.show()
+
+    def initUI(self):
+        self.setWindowTitle("Авторизация")
+
+        layout = QVBoxLayout()
+
+        # Добавляем два поля ввода
+        label1 = QLabel("Введите логин: ")
+        self.input1 = QLineEdit()  # Сохраняем поле ввода как атрибут класса
+        label2 = QLabel("Пароль: ")
+        self.input2 = QLineEdit()  # Сохраняем поле ввода как атрибут класса
+
+        layout.addWidget(label1)
+        layout.addWidget(self.input1)
+        layout.addWidget(label2)
+        layout.addWidget(self.input2)
+
+        label3 = QLabel()
+
+        auth_button = QPushButton("Авторизация")
+
+        hbox = QHBoxLayout()
+        hbox.addWidget(label3)
+        hbox.addWidget(auth_button)
+
+        layout.addLayout(hbox)
+
+        auth_button.clicked.connect(self.authenticate)  # Подключаем обработчик к кнопке
+
+        self.setLayout(layout)
+        self.setFixedSize(200, 150)
+
+    def authenticate(self):
+        login = self.input1.text()  # Получаем текст из первого поля ввода
+        password = self.input2.text()  # Получаем текст из второго поля ввода
+
+        # Здесь вы можете выполнить аутентификацию с использованием введенных логина и пароля
+        # В данном примере мы просто выводим их на экран
+        self.app.login = login
+        self.app.password = password
+
+        self.accept()  # Закрываем диалоговое окно
 
 
 class App(QWidget):
@@ -49,33 +104,197 @@ class App(QWidget):
 
     def __init__(self) -> None:
         super().__init__()
-        self.setWindowTitle('Server Manager')
-
+        self.postgres_db = PostgresDBConnect(host=HOST, user=USER, port=PORT, password=PASSWORD, database=NAME)
+        self.sqlite_db = SqliteDBConnect()
+        self.setWindowTitle('2gs')
+        self.login, self.password = self.sqlite_db.get_user()[1:3]
         self.tray_icon = QSystemTrayIcon(self)
         self.menu = QMenu(self)
-        self.url_list = QListWidget()
-
-        self.setWindowTitle('Server Manager')
+        self.menu.setStyleSheet(f"background-color: #FFFFFF;")
 
         # Добавление виджетов на форму
-        main_layout = QVBoxLayout()
-        main_layout.addWidget(self.url_list)
 
         self.urls_list = self.get_urls()
         self.server_states = {}
         self.process = {}
+        self.server_port = {}
 
-        self.setLayout(main_layout)
+        self.authorization = self.get_user()
+
         self.init_ui()
+        self.fl = True
+        self.show()
 
     def init_ui(self) -> None:
         """
         Метод для загрузки всех методов
         :return:
         """
-        self.show_icon()
 
+        self.show_icon()
+        self.structur()
+        self.move_to_bottom_right()
         self.show_server_list()
+        self.tray_icon.activated.connect(self.trigger)
+
+    def structur(self):
+        self.setMinimumSize(330, 200)  # minimal size of window, чтобы не баловались
+        self.resize(600, 350)
+        if self.layout():
+            print(142)
+            for i in reversed(range(self.layout().count())):
+                widget = self.layout().itemAt(i).widget()
+                print(widget)
+                if widget is not None:
+                    widget.deleteLater()
+        self.window_color = "#33CCFF"  # color of window
+        self.setStyleSheet(f"background-color: {self.window_color};"
+                           "font-size: 16px")  # how change window color
+        image_label = QLabel(self)
+        urls_list = False
+        # Создаем горизонтальный контейнер для размещения других элементов
+        if self.authorization:
+            self.bt_2 = QPushButton("Добавить сервер")
+            self.bt_2.clicked.connect(self.btn_2_clicked)
+            urls_list = self.sqlite_db.get_project_list()
+            print(urls_list)
+        else:
+            self.bt_2 = QPushButton("Авторизация")
+            self.bt_2.clicked.connect(self.btn_2_clicked)
+        pixmap = QPixmap('logo.png')
+        image_label.setPixmap(pixmap)
+        hbox = QHBoxLayout()
+
+        hbox.addWidget(image_label)
+        hbox.addWidget(self.bt_2)
+        hbox.addStretch()
+        self.bt_2.setStyleSheet("""QPushButton {
+                                           background: #3CB371;
+                                           border-radius: 5px;
+                                           color: #000000;
+                                           border: 2px solid #CCCCCC;
+                                           padding: 5px 1px;
+                                           max-width: 160px;
+                                            }
+
+                                           QPushButton:hover {
+                                           background-color: #1E90FF;
+                                           color: #fff;    
+                                           border: 1px solid white;
+                                           text-decoration: None;
+                                           border: 2px solid;
+                                           border-radius: 5px;
+                                           border: 2px solid;
+                                           padding: 1px 1px;
+                                            }
+                                           
+                                           QPushButton:hover:pressed {
+                                           background-color: #4682B4;
+                                           color: #fff;  
+                                           }
+                                           
+                                           QPushButton:focus {
+                                           border: 1px solid #009900}
+                                        }"""
+                                )
+
+        self.vbox = QVBoxLayout()
+        self.vbox.addLayout(hbox)
+
+
+        # Создаем вертикальный макет для размещения блоков информации
+
+
+
+        # Создаем вертикальный макет для размещения блоков информации внутри виджета прокрутки
+
+        print(len(urls_list))
+        print(213, urls_list)
+        if urls_list:
+            for i in urls_list:
+                group_box1 = QGroupBox("Блок информации 1")
+                group_box1.setStyleSheet("background-color: #6987C9;"
+                                         "height: 200px;"
+                                         "border-radius: 15px")
+                group_layout1 = QVBoxLayout()
+
+                label1 = QLabel(f"Содержимое блока информации {i}")
+                button = Switch()
+                label_switch_btn1 = QLabel(f'Checked: {button.isChecked()}')
+                button.clicked.connect(lambda checked: label_switch_btn1.setText(
+                    f'Checked: {button.isChecked()}'
+                ))
+                group_layout1.addWidget(label1)
+                hb = QHBoxLayout()
+                hb.addStretch()
+                hb.addWidget(button)
+                group_layout1.addLayout(hb)
+
+                group_box1.setLayout(group_layout1)
+                self.vbox.addWidget(group_box1)
+
+        self.vbox.addStretch()
+
+        self.setLayout(self.vbox)
+
+    def openDialog(self):
+        dialog = MyWidget(self)
+        dialog.exec_()
+        print(203)
+        self.user_verification()
+
+    def user_verification(self):
+        user = self.postgres_db.get_user_data(self.login, self.password)
+        if user:
+            user_info = user[0]
+            project_title = self.postgres_db.get_project_title(user_info[3])
+            user_info = user_info[:3] + project_title[0]
+
+            self.sqlite_db.save_user(user_info)
+            self.new_structure()
+            r = self.postgres_db.get_project_list(self.login, self.password)[0]
+            self.sqlite_db.save_project_list(r[0], r[1], user_info[3])
+
+    def new_structure(self):
+        self.bt_2.setText("Добавить сервер")
+
+        hbox_2 = QHBoxLayout()
+
+
+
+
+    def btn_2_clicked(self):
+        sender = self.sender()
+        btn_text = sender.text()
+        if btn_text == "Авторизация":
+            self.openDialog()
+        elif btn_text == "Добавить сервер":
+            self.add_application()
+
+    def get_user(self):
+        print(self.login, self.password)
+        user = self.sqlite_db.get_user()
+        # print(self.sqlite_db.project_list(self.login, self.password))
+        if user[0]:
+            return True
+        return False
+
+    def move_to_bottom_right(self):
+        desktop = QDesktopWidget().availableGeometry()
+        window_rect = self.frameGeometry()
+        x = desktop.width() - window_rect.width()
+        y = desktop.height() - window_rect.height()
+        self.move(x, y - 30)
+
+    def trigger(self, reason):
+        if reason == QSystemTrayIcon.Trigger:
+            if not self.fl:
+                self.show()
+            else:
+                self.hide()
+            self.fl = not self.fl
+        elif reason == 1:
+            self.fl = False
 
     def show_icon(self) -> None:
         """
@@ -159,10 +378,13 @@ class App(QWidget):
         :param url: (str) Название сервера.
         :return: None
         """
-        # url = "vm-srv-office.team108.ru"
-
         url = url
-        port = random.randint(1100, 1200)
+        # url = "vm-srv-office.team108.ru"
+        if url in self.server_port:
+            port = self.server_port[url]
+        else:
+            port = random.randint(1100, 1200)
+            self.server_port[url] = port
 
         cloudflared_cmd = f'cloudflared access rdp --hostname {url} --url rdp://localhost:{port}'
 
@@ -223,6 +445,14 @@ class App(QWidget):
             if url in self.process:
                 self.process[url].terminate()
                 del self.process[url]
+                port = self.server_port[url]
+                output = subprocess.check_output(f'netstat -ano | findstr :{port}', shell=True)
+                lines = output.decode('utf-8').strip().split('\n')
+                if lines:
+                    conflicting_pid = lines[0].split()[-1]
+                    os.system(f'taskkill /F /PID {conflicting_pid}')
+
+
         except Exception as e:
             print(e)
 
@@ -237,6 +467,7 @@ class App(QWidget):
         dialog.setLabelText("Введите url: https://...")
         dialog.setOkButtonText("Применить")
         dialog.setCancelButtonText("Отмена")
+        dialog.setStyleSheet(f"background-color: #FFFFFF;")
         if dialog.exec_() == QDialog.Accepted:
             text = dialog.textValue()
             self.save_url(text)
@@ -320,9 +551,25 @@ class App(QWidget):
             os.makedirs(os.path.join(db_path, "media108"))
         return os.path.join(db_path, "media108")
 
+    def closeEvent(self, event):
+        print(self.fl)
+        self.fl = False if self.fl else True
+        print(self.fl)
+
 
 if __name__ == '__main__':
+    load_dotenv()
+    NAME = os.environ.get("POSTGRES_DB", "valera_test")
+    USER = os.environ.get("POSTGRES_USER", "test")
+    PASSWORD = os.environ.get("POSTGRES_PASSWORD", "123")
+    HOST = os.environ.get("POSTGRES_HOST", "10.10.1.61")
+    PORT = os.environ.get("PORT", '5438')
+    print(HOST)
+
     app = QApplication(sys.argv)
     app.setQuitOnLastWindowClosed(False)
     ex = App()
+
+
+    # Устанавливаем стили для приложения
     sys.exit(app.exec_())

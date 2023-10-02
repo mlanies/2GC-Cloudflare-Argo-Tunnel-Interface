@@ -81,7 +81,7 @@ class App(QWidget):
         :return:
         """
         self.tray_icon = QSystemTrayIcon(self)
-        self.tray_icon.setIcon(QIcon('images/icon2.png'))
+        self.tray_icon.setIcon(QIcon('images/icon.png'))
         self.tray_icon.setVisible(True)
         self.tray_icon.setToolTip('Server Manager')
 
