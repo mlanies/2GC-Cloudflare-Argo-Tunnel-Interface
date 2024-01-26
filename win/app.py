@@ -15,10 +15,11 @@ class App(QApplication):
     """
     def __init__(self, sys_argv):
         super(App, self).__init__(sys_argv)
-        VERSION = "1.2.0"
-        SITE_URL = "2gc.io"
+        version = "2.0.0"
+        site_url = "https://2gc.io/"
+        url_views = "2gc.io"
         self.model = SqliteDBConnect()
-        self.main_view = MainView()
+        self.main_view = MainView(version, url_views, site_url)
         self.connect_view = Connector()
         self.controller = Controller(self.model, self.main_view, self.connect_view)
 
@@ -44,4 +45,5 @@ if __name__ == '__main__':
     pi = pre_init()
     if pi:
         app = App(sys.argv)
+        app.setQuitOnLastWindowClosed(False)
         sys.exit(app.exec_())
