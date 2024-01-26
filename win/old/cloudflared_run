@@ -1,6 +1,0 @@
-import os
-import time
-
-os.system('start cmd /c cloudflared access rdp --hostname ставляем_свой_урл --url rdp://localhost:1111')
-time.sleep(4)
-os.system('start cmd /c mstsc /v:localhost:1111')
