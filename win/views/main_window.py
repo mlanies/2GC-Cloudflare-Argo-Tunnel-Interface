@@ -6,12 +6,11 @@ Class:
     MainView(QMainWindow)
 
 See Also:
-    webbrowser: Библиотека для открытия сайта в основном браузере.
+    open_website: Функция для открытия сайта в браузере
     Styles: Класс в котором описанны все стили данного приложения.
     Switch, RoundedButton: Кастомные кнопки, используемые в приложении.
 """
 
-import webbrowser
 
 from PyQt5.QtGui import QCursor, QIcon, QMouseEvent
 from PyQt5.QtCore import QRect, Qt, QEvent, pyqtSignal, QObject
@@ -20,6 +19,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QDesktopWidget, QSizePoli
 
 from win.views.buttons import Switch, RoundedButton
 from .style import Styles
+from win.utils import open_website
 
 
 class MainView(QMainWindow):
@@ -49,8 +49,6 @@ class MainView(QMainWindow):
         mouseMoveEvent(self, event): Переопределённый обработчик события перемещения мыши.
         mouseReleaseEvent(self, watched, event): Переопределённый обработчик события отпускания кнопки мыши.
 
-        open_website(): Открывает веб-сайт в браузере по умолчанию.
-
     Protect:
         _set_icon(): Метод создает иконку приложения.
         _set_trey_icon(): Метод создает иконку в трее и задает ей тул тип.
@@ -63,7 +61,7 @@ class MainView(QMainWindow):
         _set_body(): Задает стили, отступы, очередность расположения элементов в основной части приложения.
         _set_bottom(): Задает стили, отступы, очередность расположения элементов в нижней части приложения.
 
-         _empty_click(): Обработчик клика на switсh кнопку при отсутствии url.
+        _empty_click(): Обработчик клика на switсh кнопку при отсутствии url.
     Private:
 
         __exit_application(): Скрывает значок в системном лотке, и корректно завершает приложение.
@@ -149,7 +147,7 @@ class MainView(QMainWindow):
         """
         Инициализация пользовательского интерфейса.
 
-        Вызывает необходимые методы для установки иконки, системного лотка, меню, положения и структуры окна.
+        Вызывает необходимые методы для установки иконки, регистрации в трее, меню, положения и структуры окна.
 
         :return: None
         """
@@ -297,7 +295,7 @@ class MainView(QMainWindow):
         """
         try:
             if watched == self.site_link and event.type() == QEvent.MouseButtonPress:
-                self.open_website()
+                open_website(self.site_url)
             return super().eventFilter(watched, event)
 
         except Exception as ex:
@@ -343,11 +341,9 @@ class MainView(QMainWindow):
     def mouseReleaseEvent(self, event: QMouseEvent) -> None:
         """
             Переопределённый обработчик события отпускания кнопки мыши.
-
         Сбрасывает флаг перемещения, возвращает курсор в обычное состояние.
 
         :param event: (QMouseEvent) Событие отпускания кнопки мыши.
-
         :return: None
         """
         self.moveFlag = False
@@ -367,10 +363,4 @@ class MainView(QMainWindow):
         QToolTip.showText(self.url_input.mapToGlobal(self.url_input.rect().bottomLeft()),
                           "URL не должен быть пустым", self.url_input, QRect(), 3000)
 
-    def open_website(self) -> None:
-        """
-            Открывает веб-сайт в браузере по умолчанию.
 
-        :return: None
-        """
-        webbrowser.open(self.site_url)

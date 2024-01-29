@@ -20,7 +20,7 @@ class App(QApplication):
         url_views = "2gc.io"
         self.model = SqliteDBConnect()
         self.main_view = MainView(version, url_views, site_url)
-        self.connect_view = Connector()
+        self.connect_view = Connector(version, url_views, site_url)
         self.controller = Controller(self.model, self.main_view, self.connect_view)
 
         self.main_view.show()

@@ -26,7 +26,7 @@ class Controller(QObject):
 
         self.main_view.switch_button.clicked.connect(self.handle_switch_click)
         self.main_view.open_connect.connect(self.open_connect_views)
-        self.connect_view.dataSent.connect(self.receive_data)
+        self.connect_view.data_sent.connect(self.receive_data)
 
 
     def set_main_input_text(self):
