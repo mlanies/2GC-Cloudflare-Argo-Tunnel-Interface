@@ -151,11 +151,11 @@ class MainView(QMainWindow):
 
         :return: None
         """
-        self.__set_icon()
-        self.__set_trey_icon()
-        self.__set_tray_menu()
-        self.__set_position()
-        self.__set_structure()
+        self._set_icon()
+        self._set_trey_icon()
+        self._set_tray_menu()
+        self._set_position()
+        self._set_structure()
 
     def _set_icon(self) -> None:
         """
@@ -206,9 +206,9 @@ class MainView(QMainWindow):
         self.setCentralWidget(self.dom_widget)
         self.close_button.move(self.width() - 25, 5)
 
-        self.__set_header()
-        self.__set_body()
-        self.__set_bottom()
+        self._set_header()
+        self._set_body()
+        self._set_bottom()
 
     def _set_header(self) -> None:
         """
@@ -216,7 +216,7 @@ class MainView(QMainWindow):
 
         :return: None
         """
-        self.__set_logo_style()
+        self._set_logo_style()
         self.main_layout.setSpacing(0)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.addWidget(self.logo_label)

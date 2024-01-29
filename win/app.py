@@ -3,7 +3,7 @@ import sys
 import psutil
 from PyQt5.QtWidgets import QApplication
 
-from models import Model
+
 from controller import Controller
 from views import MainView, Connector
 from db.db_connector import SqliteDBConnect
