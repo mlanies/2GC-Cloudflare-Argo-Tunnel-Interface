@@ -24,6 +24,7 @@ class App(QApplication):
         self.controller = Controller(self.model, self.main_view, self.connect_view)
 
         self.main_view.show()
+        # self.connect_view.show()
         self.main_view.setWindowTitle("2GC Free")
 
 def pre_init():

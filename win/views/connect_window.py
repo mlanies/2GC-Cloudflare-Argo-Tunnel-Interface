@@ -13,7 +13,7 @@ See Also:
 """
 
 from PyQt5.QtCore import pyqtSignal, Qt, QObject, QEvent
-from PyQt5.QtGui import QCursor, QKeyEvent, QMouseEvent
+from PyQt5.QtGui import QCursor, QKeyEvent, QMouseEvent, QIcon
 from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel, QHBoxLayout, QLineEdit, QPushButton, \
     QCheckBox, QSizePolicy, QDesktopWidget
 
@@ -31,6 +31,7 @@ class Connector(QMainWindow):
     Attributes:
     -----------
         :cvar: data_sent (pyqtSignal): Сигнал, для передачи данных пользователя.
+        :cvar: update_settings (pyqtSignal): Сигнал, для передачи измененных настроек.
 
     Parameters
         -----------
@@ -53,7 +54,7 @@ class Connector(QMainWindow):
 
         _set_header(): Задает стили, отступы и логотип в верхней части приложения.
         _set_logo_style(): Устанавливает стили, отступы и параметры Логотипа.
-        _set_body(): Задает стили, отступы, очередность расположения элементов в основной части приложения.
+        _set_main_body(): Задает стили, отступы, очередность расположения элементов в основной части приложения.
         _set_bottom(): Задает стили, отступы, очередность расположения элементов в нижней части приложения.
 
 
@@ -64,6 +65,7 @@ class Connector(QMainWindow):
 
     """
     data_sent = pyqtSignal(str, str, str, bool)
+    update_settings = pyqtSignal(str, bool)
     def __init__(self, version: str, url_views: str, site_url: str):
         """
             Инициализирует экземпляр класса MainView.
@@ -77,8 +79,8 @@ class Connector(QMainWindow):
         self.setWindowFlag(Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setWindowTitle("2GC: Server Manager")
-        self.setMinimumSize(230, 180)  # minimal size of window, чтобы не баловались
-        self.resize(230, 320)
+        self.setMinimumSize(230, 350)  # minimal size of window, чтобы не баловались
+        self.resize(230, 350)
 
         # widget
         self.dom_widget = QWidget(self)
@@ -90,34 +92,58 @@ class Connector(QMainWindow):
         self.main_layout = QVBoxLayout(self.dom_widget)
         self.body_form_layout = QVBoxLayout(self.body_widget)
         self.bottom_layout = QHBoxLayout(self.bottom_widget)
-        self.save_layout = QHBoxLayout()
+        self.save_layout = None
+        self.settings_connect_layout = None
+
+        self.printer_layout = None
+        self.disks_layout = None
+        self.sound_layout = None
+        self.wallpapers_layout = None
+        self.all_monitors_layout = None
 
         # label
         self.logo_label = QLabel("2GC", self.top_widget)
-        self.connect_label = QLabel(self)
+        self.settings_label = None
         self.version_label = QLabel(f"2GC FREE v{version}", self)
         self.site_link = QLabel(url_views, self)
 
-        self.user_name_label = QLabel("Пользователь")
-        self.password_label = QLabel("Пароль")
-        self.domain_name_label = QLabel("Домен")
-        self.save_text_label = QLabel("Сохранить")
+        self.user_name_label = None
+        self.password_label = None
+        self.domain_name_label = None
+        self.save_text_label = None
+
+        self.redirecting_the_printer_label = None
+        self.redirecting_the_disks_label = None
+        self.sound_from_remote_desktop_label = None
+        self.desktop_wallpapers_label = None
+        self.use_all_monitors_label = None
 
         # line edit
-        self.user_name_input = QLineEdit(self.body_widget)
-        self.password_input = QLineEdit(self.body_widget)
-        self.domain_name_input = QLineEdit(self.body_widget)
+        self.user_name_input = None
+        self.password_input = None
+        self.domain_name_input = None
 
         # buttons
-        self.connect_btn = QPushButton("Подключиться", self)
+        self.connect_btn = None
+        self.apply_btn = None
         self.close_button = RoundedButton(self)
 
         # check box
-        self.save_checkbox = QCheckBox(self)
+        self.save_checkbox = None
+        self.redirecting_the_printer_checkbox = None
+        self.redirecting_the_disks_checkbox = None
+        self.sound_from_remote_desktop_checkbox = None
+        self.desktop_wallpapers_checkbox = None
+        self.use_all_monitors_checkbox = None
+
+        # icon
+        self.settings_buttons = QIcon('images/settings_buttons.png')
 
         self.user_name = ""
         self.domain_name = ""
+        self.main_body = True
         self.site_url = site_url
+        self.settings_data = dict()
 
         self.style = Styles()
 
@@ -133,6 +159,16 @@ class Connector(QMainWindow):
         """
         self._set_position()
         self._set_structure()
+        self._set_style_widget()
+
+    def _set_style_widget(self):
+        self.body_widget.setContentsMargins(15, 0, 15, 0)
+
+        self.body_widget.setStyleSheet(self.style.to_body())
+        self.bottom_widget.setStyleSheet(self.style.to_bottom())
+        self.version_label.setStyleSheet(self.style.to_version_label())
+        self.site_link.setStyleSheet(self.style.write_color())
+
 
     def set_user_info(self, user_info: dict) -> None:
         """
@@ -156,7 +192,9 @@ class Connector(QMainWindow):
         self.close_button.move(self.width() - 25, 5)
 
         self._set_header()
-        self._set_body()
+        self.main_layout.addWidget(self.body_widget, 150)
+        # self._set_settings_body()
+        self._set_main_body()
         self._set_bottom()
 
     def _set_header(self) -> None:
@@ -185,12 +223,148 @@ class Connector(QMainWindow):
         self.logo_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.logo_label.setContentsMargins(0, 10, 0, 10)
 
-    def _set_body(self):
-        self.body_widget.setContentsMargins(15, 0, 15, 0)
-        self.body_widget.setStyleSheet(f"background-color: #393939;")
-        self.main_layout.addWidget(self.body_widget, 150)
+    def main_body_create_widgets(self):
+        self.save_layout = QHBoxLayout()
+        self.settings_connect_layout = QHBoxLayout()
+
+        self.settings_label = QLabel(self)
+
+        self.user_name_label = QLabel("Пользователь")
+        self.password_label = QLabel("Пароль")
+        self.domain_name_label = QLabel("Домен")
+        self.save_text_label = QLabel("Сохранить")
+
+        self.user_name_input = QLineEdit()
+        self.password_input = QLineEdit()
+        self.domain_name_input = QLineEdit()
+
+        self.connect_btn = QPushButton("Подключиться")
+
+        self.save_checkbox = QCheckBox()
+
+        self.settings_buttons = QIcon('images/settings_buttons.png')
+
+    def settings_body_create_widgets(self):
+        self.printer_layout = QHBoxLayout()
+        self.disks_layout = QHBoxLayout()
+        self.sound_layout = QHBoxLayout()
+        self.wallpapers_layout = QHBoxLayout()
+        self.all_monitors_layout = QHBoxLayout()
+
+        self.redirecting_the_printer_label = QLabel("Перенаправление принтера")
+        self.redirecting_the_disks_label = QLabel("Перенаправление дисков")
+        self.sound_from_remote_desktop_label = QLabel("Звук с удаленного компьютера")
+        self.desktop_wallpapers_label = QLabel("Отображение обоев удаленного компьютера")
+        self.use_all_monitors_label = QLabel("Использовать все мониторы")
+
+        self.redirecting_the_printer_label.setStyleSheet(self.style.write_color())
+        self.redirecting_the_disks_label.setStyleSheet(self.style.write_color())
+        self.sound_from_remote_desktop_label.setStyleSheet(self.style.write_color())
+        self.desktop_wallpapers_label.setStyleSheet(self.style.write_color())
+        self.desktop_wallpapers_label.setWordWrap(True)
+        self.use_all_monitors_label.setStyleSheet(self.style.write_color())
+
+        self.apply_btn = QPushButton("Применить")
+
+        self.apply_btn.setStyleSheet(self.style.to_connect_btn())
+
+        self.redirecting_the_printer_checkbox = QCheckBox()
+        self.redirecting_the_printer_checkbox.setChecked(self.settings_data.get("printer", True))
+        self.redirecting_the_printer_checkbox.stateChanged.connect(self.on_checkbox_changed)
+
+        self.redirecting_the_disks_checkbox = QCheckBox()
+        self.redirecting_the_disks_checkbox.setChecked(self.settings_data.get("disks", False))
+        self.redirecting_the_disks_checkbox.stateChanged.connect(self.on_checkbox_changed)
+
+        self.sound_from_remote_desktop_checkbox = QCheckBox()
+        self.sound_from_remote_desktop_checkbox.setChecked(self.settings_data.get("sound", True))
+        self.sound_from_remote_desktop_checkbox.stateChanged.connect(self.on_checkbox_changed)
+
+        self.desktop_wallpapers_checkbox = QCheckBox()
+        self.desktop_wallpapers_checkbox.setChecked(self.settings_data.get("desktop_wallpapers", True))
+        self.desktop_wallpapers_checkbox.stateChanged.connect(self.on_checkbox_changed)
+
+        self.use_all_monitors_checkbox = QCheckBox()
+        self.use_all_monitors_checkbox.setChecked(self.settings_data.get("use_all_monitors", True))
+        self.use_all_monitors_checkbox.stateChanged.connect(self.on_checkbox_changed)
+
+        self.unsetCursor()
+
+    def on_checkbox_changed(self):
+        switch_dict = {
+            self.redirecting_the_printer_checkbox: "printer",
+            self.redirecting_the_disks_checkbox: "disks",
+            self.sound_from_remote_desktop_checkbox: "sound",
+            self.desktop_wallpapers_checkbox: "desktop_wallpapers",
+            self.use_all_monitors_checkbox: "use_all_monitors"
+        }
+        checkbox = self.sender()
+        settings_name = switch_dict[checkbox]
+        new_settings_value = not self.settings_data[settings_name]
+        self.settings_data[settings_name] = not new_settings_value
+
+        self.update_settings.emit(settings_name, new_settings_value)
+
+    def _set_settings_body(self):
+        self.settings_body_create_widgets()
+        self.printer_layout.addWidget(self.redirecting_the_printer_checkbox)
+        self.printer_layout.addWidget(self.redirecting_the_printer_label)
+        self.printer_layout.addStretch()
+
+        self.disks_layout.addWidget(self.redirecting_the_disks_checkbox)
+        self.disks_layout.addWidget(self.redirecting_the_disks_label)
+        self.disks_layout.addStretch()
+
+        self.sound_layout.addWidget(self.sound_from_remote_desktop_checkbox)
+        self.sound_layout.addWidget(self.sound_from_remote_desktop_label)
+        self.sound_layout.addStretch()
+
+        self.wallpapers_layout.addWidget(self.desktop_wallpapers_checkbox)
+        self.wallpapers_layout.addWidget(self.desktop_wallpapers_label)
+        self.wallpapers_layout.addStretch()
+
+        self.all_monitors_layout.addWidget(self.use_all_monitors_checkbox)
+        self.all_monitors_layout.addWidget(self.use_all_monitors_label)
+        self.all_monitors_layout.addStretch()
+
+        self.body_form_layout.addLayout(self.printer_layout)
+        self.body_form_layout.addLayout(self.disks_layout)
+        self.body_form_layout.addLayout(self.sound_layout)
+        self.body_form_layout.addLayout(self.wallpapers_layout)
+        self.body_form_layout.addLayout(self.all_monitors_layout)
+        self.body_form_layout.addWidget(self.apply_btn)
+
+        self.apply_btn.clicked.connect(self.repaint_body)
+        self.apply_btn.setCursor(QCursor(Qt.PointingHandCursor))
+
+        self.unsetCursor()
+
+    def repaint_body(self):
+        try:
+            self.clear_vbox(self.body_form_layout)
+        except Exception as ex:
+            print(ex)
+
+        if self.main_body:
+            self._set_settings_body()
+        else:
+            self._set_main_body()
+        self.main_body = not self.main_body
+        self.repaint()
 
 
+    def clear_vbox(self, vbox):
+        if vbox is not None:
+            while vbox.count():
+                item = vbox.takeAt(0)
+                widget = item.widget()
+                if widget is not None:
+                    widget.deleteLater()
+                else:
+                    self.clear_vbox(item.layout())
+
+    def _set_main_body(self):
+        self.main_body_create_widgets()
         self.user_name_input.setStyleSheet(self.style.to_input())
         if self.user_name:
             self.user_name_input.setText(self.user_name)
@@ -212,15 +386,19 @@ class Connector(QMainWindow):
         self.password_label.setStyleSheet(self.style.to_input_label())
         self.domain_name_label.setStyleSheet(self.style.to_input_label())
 
+        # Первая линия
         self.body_form_layout.addWidget(self.user_name_label)
         self.body_form_layout.addWidget(self.user_name_input)
 
+        # Вторая линия
         self.body_form_layout.addWidget(self.password_label)
         self.body_form_layout.addWidget(self.password_input)
 
+        # Третья линия
         self.body_form_layout.addWidget(self.domain_name_label)
         self.body_form_layout.addWidget(self.domain_name_input)
 
+        # Четвертая линия
         self.save_text_label.setStyleSheet(self.style.to_input_label())
         self.save_layout.addWidget(self.save_checkbox)
         self.save_layout.addWidget(self.save_text_label)
@@ -231,12 +409,26 @@ class Connector(QMainWindow):
 
         self.body_form_layout.addLayout(self.save_layout)
 
+        # Пятая линия
         self.connect_btn.setStyleSheet(self.style.to_connect_btn())
         self.connect_btn.clicked.connect(self.send_data)
+        self.connect_btn.setCursor(QCursor(Qt.PointingHandCursor))
 
-        self.body_form_layout.addWidget(self.connect_btn)
+        self.settings_label.setPixmap(self.settings_buttons.pixmap(30, 30))
+        self.settings_label.setMinimumWidth(30)
+        self.settings_label.setCursor(QCursor(Qt.PointingHandCursor))
 
-        self.setCursor(QCursor(Qt.PointingHandCursor))
+        self.settings_connect_layout.addWidget(self.connect_btn)
+        self.settings_connect_layout.addWidget(self.settings_label)
+
+        self.connect_btn.setMinimumWidth(180)
+
+        self.body_form_layout.addLayout(self.settings_connect_layout)
+
+        self.unsetCursor()
+
+
+
 
     def _set_bottom(self) -> None:
         """
@@ -244,10 +436,6 @@ class Connector(QMainWindow):
 
         :return: None
         """
-        self.bottom_widget.setStyleSheet(self.style.to_bottom())
-        self.version_label.setStyleSheet(self.style.to_version_label())
-        self.site_link.setStyleSheet(self.style.write_color())
-
         self.site_link.setCursor(Qt.PointingHandCursor)
         self.site_link.installEventFilter(self)
 
@@ -304,11 +492,22 @@ class Connector(QMainWindow):
         :param event: (QMouseEvent) Событие нажатия кнопки мыши.
         :return: None
         """
-        if event.button() == Qt.LeftButton:
-            self.moveFlag = True
-            self.movePosition = event.globalPos() - self.pos()
-            self.setCursor(QCursor(Qt.OpenHandCursor))
-        super().mousePressEvent(event)
+        try:
+            if event.button() == Qt.LeftButton:
+                if self.main_body:
+                    if self.settings_label.underMouse():
+                        self.repaint_body()
+                    else:
+                        self.moveFlag = True
+                        self.movePosition = event.globalPos() - self.pos()
+                        self.setCursor(QCursor(Qt.OpenHandCursor))
+                else:
+                    self.moveFlag = True
+                    self.movePosition = event.globalPos() - self.pos()
+                    self.setCursor(QCursor(Qt.OpenHandCursor))
+            super().mousePressEvent(event)
+        except Exception as ex:
+            print(ex)
 
     def mouseMoveEvent(self, event: QMouseEvent) -> None:
         """

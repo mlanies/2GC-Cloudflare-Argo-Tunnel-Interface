@@ -10,7 +10,6 @@ See Also:
     connect_view: (Connector) Класс представление окна для подключения к столу.
 """
 
-
 import os
 import subprocess
 import time
@@ -85,6 +84,7 @@ class Controller(QObject):
         self.set_main_input_text()
         self.set_connect_user_info()
         self.connect_signals()
+        self.set_settings()
 
     def connect_signals(self) -> None:
         """
@@ -93,6 +93,11 @@ class Controller(QObject):
         self.main_view.switch_button.clicked.connect(self.handle_switch_click)
         self.main_view.open_connect.connect(self.open_connect_views)
         self.connect_view.data_sent.connect(self.receive_data)
+        self.connect_view.update_settings.connect(self.update_settings)
+
+    def update_settings(self, settings_name, new_value):
+        self.model.update_last_record(settings_name, new_value)
+        self.set_settings()
 
     def set_main_input_text(self) -> None:
         """
@@ -118,6 +123,17 @@ class Controller(QObject):
         """
         user_info = self.model.get_user_info()
         self.connect_view.set_user_info(user_info)
+
+    def set_settings(self):
+        settings_data = self.model.get_settings()
+        data = {
+            "printer": bool(settings_data[1]),
+            "disks": bool(settings_data[2]),
+            "sound": bool(settings_data[3]),
+            "desktop_wallpapers": bool(settings_data[4]),
+            "use_all_monitors": bool(settings_data[5])
+        }
+        self.connect_view.settings_data = data
 
     def connection_management(self, url: str) -> None:
         """

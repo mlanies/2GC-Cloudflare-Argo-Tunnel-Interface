@@ -97,7 +97,7 @@ class MainView(QMainWindow):
         """
         super().__init__()
         self.tray_icon = QSystemTrayIcon(self)
-        self.setWindowFlag(Qt.FramelessWindowHint)
+        self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setWindowTitle("2GC: Server Manager")
         self.setMinimumSize(280, 180)  # minimal size of window, чтобы не баловались
@@ -171,6 +171,11 @@ class MainView(QMainWindow):
         self.tray_icon.setIcon(self.dgc_png)
         self.tray_icon.setVisible(True)
         self.tray_icon.setToolTip('2GC: Server Manager')
+        self.tray_icon.activated.connect(self.show_window)
+
+    def show_window(self, reason):
+        if reason == QSystemTrayIcon.Trigger:
+            self.showNormal()
 
     def _set_tray_menu(self) -> None:
         """
@@ -252,7 +257,6 @@ class MainView(QMainWindow):
 
         self.body_form_layout.addWidget(self.url_input)
         self.body_form_layout.addWidget(self.switch_button)
-        self.body_form_layout.addWidget(self.connect_label)
         self.body_form_layout.addWidget(self.connect_label)
 
     def _set_bottom(self) -> None:

@@ -33,13 +33,15 @@ class SqliteDBConnect:
             add_user_info(user_name, domain): Добавляет информацию о пользователе в базу данных.
             get_user_info() -> dict: Возвращает информацию о последнем пользователе из базы данных.
             get_or_create_path() -> str: Получает или создает путь к папке для хранения базы данных.
+            insert_default_settings(): Вставляет изначальные значения в settings, если таблица пуста.
 
         Protect:
             _insert_query(query, data): Выполняет вставку данных в таблицу.
 
         Private:
-           __create_urls_table(): Создает таблицу для URL-адресов, если она не существует.
-           __create_login_table(): Создает таблицу для хранения информации о пользователе, если она не существует.
+            __create_settings_table(): Создает таблицу для хранения информации о пользователе, если она не существует.
+            __create_urls_table(): Создает таблицу для URL-адресов, если она не существует.
+            __create_login_table(): Создает таблицу для хранения информации о пользователе, если она не существует.
        """
 
     def __init__(self):
@@ -47,6 +49,7 @@ class SqliteDBConnect:
         self.database_path = os.path.join(self.get_or_create_path(), "2gс.sqlite")
         self.__create_urls_table()
         self.__create_login_table()
+        self.__create_settings_table()
         self.user_position = 1
 
     def __create_urls_table(self):
@@ -78,6 +81,50 @@ class SqliteDBConnect:
         ''')
         self.execute_query(query)
 
+    def __create_settings_table(self):
+        """
+            Создает таблицу для хранения настроек подключения, если она не существует.
+
+        :return: None
+        """
+        query = ('''
+            CREATE TABLE IF NOT EXISTS settings (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                printer INTEGER ,
+                disks INTEGER ,
+                sound INTEGER ,
+                desktop_wallpapers INTEGER ,
+                use_all_monitors INTEGER 
+            )
+        ''')
+        self.execute_query(query)
+        self.insert_default_settings()
+
+    def update_last_record(self, column, value):
+        query = f"UPDATE settings SET {column} = ? WHERE id = (SELECT MAX(id) FROM settings)"
+        data = (value,)
+        self._insert_query(query, data)
+
+    def insert_default_settings(self):
+        """
+        Вставляет запись со значениями 1 в таблицу settings, если таблица пуста.
+
+        :return: None
+        """
+        count = self.get_settings()
+        if not count:
+            query = '''
+                INSERT INTO settings (printer, disks, sound, desktop_wallpapers, use_all_monitors) 
+                VALUES (?, ?, ?, ?, ?)
+            '''
+            data = (1, 0, 1, 1, 1)
+            self._insert_query(query, data)
+
+    def get_settings(self):
+        query = "SELECT * FROM settings"
+        count = self.execute_query(query)
+        return count
+
     def get_or_create_path(self) -> str:
         """
             Метод для получения пути до папки в которой будет храниться база данных.
@@ -99,10 +146,9 @@ class SqliteDBConnect:
         connect, cursor = self.get_connect()
         cursor.execute(query)
         if "select" in query.lower():
-            first_user = cursor.fetchone()
-            print(first_user)
+            first_value = cursor.fetchone()
             self.close_connect(connect)
-            return first_user
+            return first_value
         self.close_connect(connect)
 
     def get_all_records(self, query: str) -> list:
