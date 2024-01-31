@@ -34,6 +34,8 @@ class SqliteDBConnect:
             get_user_info() -> dict: Возвращает информацию о последнем пользователе из базы данных.
             get_or_create_path() -> str: Получает или создает путь к папке для хранения базы данных.
             insert_default_settings(): Вставляет изначальные значения в settings, если таблица пуста.
+            update_last_record(): Обновляет у последней записи, в таблице с параметрами, её значение.
+            get_count_settings(): Возвращает все записи из таблицы настроек.
 
         Protect:
             _insert_query(query, data): Выполняет вставку данных в таблицу.
@@ -100,7 +102,14 @@ class SqliteDBConnect:
         self.execute_query(query)
         self.insert_default_settings()
 
-    def update_last_record(self, column, value):
+    def update_last_record(self, column: str, value: bool) -> None:
+        """
+            Обновляет у последней записи, в таблице с параметрами, её значение.
+
+        :param: column: (str) Название параметра.
+        :param: value: (bool) Его новое значение.
+        :return: None
+        """
         query = f"UPDATE settings SET {column} = ? WHERE id = (SELECT MAX(id) FROM settings)"
         data = (value,)
         self._insert_query(query, data)
@@ -111,7 +120,7 @@ class SqliteDBConnect:
 
         :return: None
         """
-        count = self.get_settings()
+        count = self.get_count_settings()
         if not count:
             query = '''
                 INSERT INTO settings (printer, disks, sound, desktop_wallpapers, use_all_monitors) 
@@ -120,7 +129,13 @@ class SqliteDBConnect:
             data = (1, 0, 1, 1, 1)
             self._insert_query(query, data)
 
-    def get_settings(self):
+    def get_count_settings(self) -> Any:
+        """
+            Возвращает все записи из таблицы настроек.
+
+        :return: Возвращает все значения, но по факту нужно, что бы понять существуют ли записи вообще.
+        """
+
         query = "SELECT * FROM settings"
         count = self.execute_query(query)
         return count
@@ -128,6 +143,7 @@ class SqliteDBConnect:
     def get_or_create_path(self) -> str:
         """
             Метод для получения пути до папки в которой будет храниться база данных.
+
         :return: (str) Путь до базы данных
         """
         current_directory = os.getcwd()

@@ -4,6 +4,9 @@
 Class:
     Controller(QObject)
 
+Var:
+    SETTINGS_COMMAND: Кортеж с параметрами подключения: 1 элемент: отключает параметр, второй включает.
+
 See Also:
     model: (SqliteDBConnect) Класс для работы с базой данных.
     view: (MainView) Класс представление главного окна приложения.
@@ -14,11 +17,20 @@ import os
 import subprocess
 import time
 import random
+from typing import Union
 
 from PyQt5.QtCore import QObject, Qt
 from PyQt5.QtGui import QCursor
 
 from win.logs.log_tracker import FileLogger
+
+SETTINGS_COMMAND = (
+    ("/noprinters ", "/printers "),
+    ("/nodrives ", ""),
+    ("/nosound ", "/sound "),
+    ("/nowallpaper ", "/wallpaper "),
+    ("/fullscreen /mon:current ", "/multimon "),
+)
 
 
 class Controller(QObject):
@@ -44,18 +56,21 @@ class Controller(QObject):
     -----------
     Public:
         connect_signals(): Подключает сигналы к слотам.
+        set_settings(): Передает данные о параметрах подключения в окно с настройками.
+        update_settings(): Принимает изменения в настройках подключения и обновляет их.
         set_main_input_text(): Задает текст в окне ввода URL основного представления.
         set_connect_user_info(): Получает данные пользователя и передает их в окно подключения.
         connection_management(): Управляет пробросом сокета.
         handle_switch_click(): Обрабатывает нажатие на кнопку проброса сокета к серверу.
-        toggle_server_state(url): Изменяет состояние сервера.
+        toggle_server_state(): Изменяет состояние сервера.
         changing_appearance_window(): Обновляет состояния и внешний вид кнопок.
         open_connect_views(): Открывает окно подключения, если параметр open_window равен True.
         receive_data(): Получает данные пользователя и открывает RDP-соединение.
 
     Protect:
-        _connect_to_server(url): Формирует команду для запуска сервера.
-        _disconnect_socket(url): Завершает процесс.
+        _connect_to_server(): Формирует команду для запуска сервера.
+        _disconnect_socket(): Завершает процесс.
+        _set_command_for_shell() Добавляет в команду для подключения дополнительные параметры.
 
     Private:
         __open_rdp(): Открывает RDP-соединение с указанными данными пользователя.
@@ -95,7 +110,14 @@ class Controller(QObject):
         self.connect_view.data_sent.connect(self.receive_data)
         self.connect_view.update_settings.connect(self.update_settings)
 
-    def update_settings(self, settings_name, new_value):
+    def update_settings(self, settings_name: str, new_value: bool) -> None:
+        """
+            Принимает изменения в настройках подключения и обновляет их.
+
+        :param: settings_name (str):  Название параметра подключения.
+        :param: new_value (bool): Его новое значение.
+        :return: None
+        """
         self.model.update_last_record(settings_name, new_value)
         self.set_settings()
 
@@ -125,7 +147,12 @@ class Controller(QObject):
         self.connect_view.set_user_info(user_info)
 
     def set_settings(self):
-        settings_data = self.model.get_settings()
+        """
+            Передает данные о параметрах подключения в окно с настройками.
+
+        :return: None
+        """
+        settings_data = self.model.get_count_settings()
         data = {
             "printer": bool(settings_data[1]),
             "disks": bool(settings_data[2]),
@@ -243,22 +270,39 @@ class Controller(QObject):
             FileLogger.log_warning(ex)
             print(ex)
 
-    def __open_rdp(self, user_name: str, domain_name: str, password: str) -> None:
+    def __open_rdp(self, user_name: str, domain_name: Union[str, None], password: str) -> None:
         """
             Открывает RDP-соединение с указанными данными пользователя.
 
-        :param user_name: Имя пользователя для подключения к RDP.
-        :param domain_name: Доменное имя для подключения к RDP (необязательно).
-        :param password: Пароль пользователя для подключения к RDP.
+        :param user_name: (str) Имя пользователя для подключения к RDP.
+        :param domain_name: (str) Доменное имя для подключения к RDP (необязательно).
+        :param password: (str) Пароль пользователя для подключения к RDP.
         :return: None
         """
         url = self.main_view.url_input.text()
         port = self.server_port[url]
-        mstsc_command = f'rdp.exe /multimon /v:127.0.0.1:{port} /u:{user_name} /p:{password} '
+        base_command = f'rdp.exe /multimon /v:127.0.0.1:{port} /u:{user_name} /p:{password} '
+        rdp_command = self._set_command_for_shell(base_command, domain_name, url)
+        print(rdp_command)
+        self.__run_command(rdp_command)
+
+    def _set_command_for_shell(self, base_command: str, domain_name: Union[str, None], url: str) -> str:
+        """
+            Добавляет в команду для подключения дополнительные параметры.
+
+        :param base_command: (str) Базовая команда для подключения пользователя.
+        :param domain_name: (str) Доменное имя для подключения к RDP (необязательно).
+        :param url: (str) Url адреса к которому пробрасывается соединение.
+        :return: None
+        """
         if domain_name:
-            mstsc_command += f"/domain:{domain_name} "
-        mstsc_command += f"/programtitle:2GC_{url} /title:2GC_{url}"
-        self.__run_command(mstsc_command)
+            base_command += f"/domain:{domain_name} "
+        settings = self.model.get_settings()[1:]
+        for index, seting in enumerate(settings):
+            base_command += SETTINGS_COMMAND[index][seting]
+        base_command += f"/programtitle:2GC_{url} /title:2GC_{url}"
+        return base_command
+
 
     def __run_command(self, command: str, url: str = None) -> None:
         """

@@ -118,8 +118,7 @@ class Styles:
             height : {self.pixel_27};
             color: {self.color_black};
             box-shadow : {self.shadow_0_4_4_0};
-            margin-left: {45};
-            margin-right: {45};
+            margin-right: {10}px;
         """
 
     def to_input_label(self) -> str:

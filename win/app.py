@@ -3,7 +3,6 @@ import sys
 import psutil
 from PyQt5.QtWidgets import QApplication
 
-
 from controller import Controller
 from views import MainView, Connector
 from db.db_connector import SqliteDBConnect
@@ -13,6 +12,7 @@ class App(QApplication):
     """
         Класс для запуска приложения.
     """
+
     def __init__(self, sys_argv):
         super(App, self).__init__(sys_argv)
         version = "2.0.0"
@@ -24,8 +24,8 @@ class App(QApplication):
         self.controller = Controller(self.model, self.main_view, self.connect_view)
 
         self.main_view.show()
-        # self.connect_view.show()
         self.main_view.setWindowTitle("2GC Free")
+
 
 def pre_init():
     try:

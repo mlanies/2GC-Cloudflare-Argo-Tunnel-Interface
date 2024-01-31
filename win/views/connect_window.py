@@ -15,7 +15,7 @@ See Also:
 from PyQt5.QtCore import pyqtSignal, Qt, QObject, QEvent
 from PyQt5.QtGui import QCursor, QKeyEvent, QMouseEvent, QIcon
 from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel, QHBoxLayout, QLineEdit, QPushButton, \
-    QCheckBox, QSizePolicy, QDesktopWidget
+    QCheckBox, QSizePolicy, QDesktopWidget, QLayout
 
 from win.views.buttons import RoundedButton
 from win.views.style import Styles
@@ -42,19 +42,32 @@ class Connector(QMainWindow):
     Methods:
     -------
     Public:
-        init_ui(): Инициализация пользовательского интерфейса.
-        eventFilter(self, watched, event): Переопределённый метод для обработки событий фильтрации.
-        mousePressEvent(self, event): Переопределённый обработчик события нажатия кнопки мыши
-        mouseMoveEvent(self, event): Переопределённый обработчик события перемещения мыши.
-        mouseReleaseEvent(self, watched, event): Переопределённый обработчик события отпускания кнопки мыши.
+        clear_vbox(vbox): Полностью очищает преданный лайаут.
+        close_window(): Очищает поле ввода пароля, и закрывает окно.
+        handle_input(): Обрабатывает введенные данные пользователем.
+        send_data(): Отправляет введенные данные, если заполнены обязательные поля.
+        repaint_body(): Метод для перерисовки центрального виджета.
+        on_checkbox_changed(): Отлавливает изменения чекбоксов в окне настроек, и отправляет сигнал с этим изменением.
+        eventFilter(watched, event): Переопределённый метод для обработки событий фильтрации.
+        keyPressEvent(event): Переопределённый метод обрабатывающий событие нажатия клавиши.
+        mousePressEvent(event): Переопределённый обработчик события нажатия кнопки мыши
+        mouseMoveEvent(event): Переопределённый обработчик события перемещения мыши.
+        mouseReleaseEvent(watched, event): Переопределённый обработчик события отпускания кнопки мыши.
+
+        main_body_create_widgets(): Создает все виджеты необходимые главному окну.
+        settings_body_create_widgets(): Создает все виджеты необходимые окну настроек.
+
 
     Protect:
+
+
         _set_position(): Устанавливает позицию главного окна приложения в правой нижнем углу экрана.
         _set_structure(): Устанавливает структуру главного окна приложения и вызывает методы для отрисовки элементов.
-
+        _set_style_widget():  Добавляет стили и отступы части элементов.
         _set_header(): Задает стили, отступы и логотип в верхней части приложения.
         _set_logo_style(): Устанавливает стили, отступы и параметры Логотипа.
-        _set_main_body(): Задает стили, отступы, очередность расположения элементов в основной части приложения.
+        _set_main_body(): Задает очередность расположения элементов в основной части приложения.
+        _set_settings_body(): Задает очередность расположения элементов в основной части приложения, в окне настроек.
         _set_bottom(): Задает стили, отступы, очередность расположения элементов в нижней части приложения.
 
 
@@ -66,6 +79,7 @@ class Connector(QMainWindow):
     """
     data_sent = pyqtSignal(str, str, str, bool)
     update_settings = pyqtSignal(str, bool)
+
     def __init__(self, version: str, url_views: str, site_url: str):
         """
             Инициализирует экземпляр класса MainView.
@@ -151,8 +165,7 @@ class Connector(QMainWindow):
 
     def init_ui(self) -> None:
         """
-        Инициализация пользовательского интерфейса.
-
+            Инициализация пользовательского интерфейса.
         Вызывает необходимые методы для установки положения и структуры окна.
 
         :return: None
@@ -161,14 +174,22 @@ class Connector(QMainWindow):
         self._set_structure()
         self._set_style_widget()
 
-    def _set_style_widget(self):
+    def _set_style_widget(self) -> None:
+        """
+            Добавляет стили и отступы части элементов.
+
+        :return: None
+        """
+        self.main_layout.setSpacing(0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
+        self.logo_label.setContentsMargins(0, 10, 0, 10)
         self.body_widget.setContentsMargins(15, 0, 15, 0)
 
+        self.logo_label.setStyleSheet(self.style.to_logo())
         self.body_widget.setStyleSheet(self.style.to_body())
         self.bottom_widget.setStyleSheet(self.style.to_bottom())
         self.version_label.setStyleSheet(self.style.to_version_label())
         self.site_link.setStyleSheet(self.style.write_color())
-
 
     def set_user_info(self, user_info: dict) -> None:
         """
@@ -193,7 +214,6 @@ class Connector(QMainWindow):
 
         self._set_header()
         self.main_layout.addWidget(self.body_widget, 150)
-        # self._set_settings_body()
         self._set_main_body()
         self._set_bottom()
 
@@ -204,12 +224,10 @@ class Connector(QMainWindow):
         :return: None
         """
         self._set_logo_style()
-        self.main_layout.setSpacing(0)
-        self.main_layout.setContentsMargins(0, 0, 0, 0)
+
         self.main_layout.addWidget(self.logo_label)
 
         self.top_widget.resize(self.width(), 30)
-        self.top_widget.setStyleSheet(self.style.to_transparent_widget())
         self.top_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
     def _set_logo_style(self) -> None:
@@ -218,12 +236,16 @@ class Connector(QMainWindow):
 
         :return: None
         """
-        self.logo_label.setStyleSheet(self.style.to_logo())
+
         self.logo_label.setAlignment(Qt.AlignCenter)
         self.logo_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        self.logo_label.setContentsMargins(0, 10, 0, 10)
 
-    def main_body_create_widgets(self):
+    def main_body_create_widgets(self) -> None:
+        """
+           Создает все виджеты необходимые главному окну.
+
+        :return: None
+        """
         self.save_layout = QHBoxLayout()
         self.settings_connect_layout = QHBoxLayout()
 
@@ -244,7 +266,12 @@ class Connector(QMainWindow):
 
         self.settings_buttons = QIcon('images/settings_buttons.png')
 
-    def settings_body_create_widgets(self):
+    def settings_body_create_widgets(self) -> None:
+        """
+           Создает все виджеты необходимые окну настроек.
+
+        :return: None
+        """
         self.printer_layout = QHBoxLayout()
         self.disks_layout = QHBoxLayout()
         self.sound_layout = QHBoxLayout()
@@ -290,7 +317,12 @@ class Connector(QMainWindow):
 
         self.unsetCursor()
 
-    def on_checkbox_changed(self):
+    def on_checkbox_changed(self) -> None:
+        """
+           Отлавливает изменения чекбоксов в окне настроек, и отправляет сигнал с этим изменением.
+
+        :return: None
+        """
         switch_dict = {
             self.redirecting_the_printer_checkbox: "printer",
             self.redirecting_the_disks_checkbox: "disks",
@@ -305,7 +337,12 @@ class Connector(QMainWindow):
 
         self.update_settings.emit(settings_name, new_settings_value)
 
-    def _set_settings_body(self):
+    def _set_settings_body(self) -> None:
+        """
+           Задает очередность расположения элементов в основной части приложения, в окне настроек.
+
+        :return: None
+        """
         self.settings_body_create_widgets()
         self.printer_layout.addWidget(self.redirecting_the_printer_checkbox)
         self.printer_layout.addWidget(self.redirecting_the_printer_label)
@@ -339,7 +376,13 @@ class Connector(QMainWindow):
 
         self.unsetCursor()
 
-    def repaint_body(self):
+    def repaint_body(self) -> None:
+        """
+            Метод для перерисовки центрального виджета.
+        Очищает его, и в зависимости от состояния отрисовывает нужный контент
+
+        :return: None
+        """
         try:
             self.clear_vbox(self.body_form_layout)
         except Exception as ex:
@@ -352,8 +395,12 @@ class Connector(QMainWindow):
         self.main_body = not self.main_body
         self.repaint()
 
+    def clear_vbox(self, vbox: QLayout) -> None:
+        """
+            Полностью очищает преданный лайаут.
 
-    def clear_vbox(self, vbox):
+        :return: None
+        """
         if vbox is not None:
             while vbox.count():
                 item = vbox.takeAt(0)
@@ -363,7 +410,12 @@ class Connector(QMainWindow):
                 else:
                     self.clear_vbox(item.layout())
 
-    def _set_main_body(self):
+    def _set_main_body(self) -> None:
+        """
+            Задает очередность расположения элементов в основной части приложения.
+
+        :return: None
+        """
         self.main_body_create_widgets()
         self.user_name_input.setStyleSheet(self.style.to_input())
         if self.user_name:
@@ -414,21 +466,18 @@ class Connector(QMainWindow):
         self.connect_btn.clicked.connect(self.send_data)
         self.connect_btn.setCursor(QCursor(Qt.PointingHandCursor))
 
-        self.settings_label.setPixmap(self.settings_buttons.pixmap(30, 30))
+        self.settings_label.setPixmap(self.settings_buttons.pixmap(25, 25))
         self.settings_label.setMinimumWidth(30)
         self.settings_label.setCursor(QCursor(Qt.PointingHandCursor))
 
         self.settings_connect_layout.addWidget(self.connect_btn)
         self.settings_connect_layout.addWidget(self.settings_label)
 
-        self.connect_btn.setMinimumWidth(180)
+        self.connect_btn.setMinimumWidth(150)
 
         self.body_form_layout.addLayout(self.settings_connect_layout)
 
         self.unsetCursor()
-
-
-
 
     def _set_bottom(self) -> None:
         """
@@ -592,4 +641,3 @@ class Connector(QMainWindow):
             self.user_name_input.setStyleSheet(self.style.to_input())
         if password:
             self.password_input.setStyleSheet(self.style.to_input())
-
