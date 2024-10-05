@@ -1,7 +1,3 @@
-<div id="header" align="center">
-  <img src="https://pub-a89b5697d4074daeb851dc6c011ed225.r2.dev/2gc_app_list.svg" width="300"/>
-</div>
-
 <div id="badges" align="center">
     <a href="https://2gc.ru" target="_blank">
         <!-- Логотип -->
@@ -42,6 +38,9 @@
 - ❌ Файрвол веб-приложений (WAF)
 
 ### Функции [2GC BUSINESS](https://2gc.ru/#DOWNLOADS) //на стадии разработки
+<div id="header" align="center">
+  <img src="https://pub-a89b5697d4074daeb851dc6c011ed225.r2.dev/2gc_app_list.svg" width="300"/>
+</div>
 
 - ✅ Подключение RDP
 - ✅ Подключение SSH
