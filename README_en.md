@@ -11,7 +11,10 @@
 </div>
 
 # [2GC](https://2gc.ru/en)
-[Русская версия](https://github.com/mlanies/2GC/blob/main/README.md)
+<p>
+    <a href="https://github.com/mlanies/2GC/blob/main/README.md">Русская версия</a>
+</p>
+
 
 
 **2GC** is a convenient application for launching an encrypted **Argo Tunnel** channel, a reverse proxy server via **Cloudflare**.
