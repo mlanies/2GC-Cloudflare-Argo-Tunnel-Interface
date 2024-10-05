@@ -4,7 +4,7 @@
 
 <div id="badges" align="center">
     <a href="https://2gc.ru" target="_blank">
-        <img src="https://img.shields.io/badge/website-000000?style=for-the-badge&logo=2gc.ru&logoColor=white" alt="2GC"/>
+        <img src="https://img.shields.io/badge/website-000000?style=for-the-badge&logo=About.2gc&logoColor=white" alt="2GC"/>
     </a>
     <a href="https://t.me/suppport2gc_bot" target="_blank">
         <img src="https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white" alt="Telegram Bot"/>
