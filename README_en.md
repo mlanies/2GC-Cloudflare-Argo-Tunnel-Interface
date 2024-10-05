@@ -31,7 +31,7 @@
 - Windows 10 or higher
 - Internet connection of 10 Mbps or higher
 
-### Features of [2GC FREE](https://2gc.ru/#DOWNLOADS)
+### Features of [2GC FREE](https://2gc.ru/en/download)
 
 - ✅ RDP Connection
 - ❌ SSH Connection
@@ -43,7 +43,7 @@
 - ❌ Single Sign-On (SSO)
 - ❌ Web Application Firewall (WAF)
 
-### Features of [2GC BUSINESS](https://2gc.ru/#DOWNLOADS) //under development
+### Features of [2GC BUSINESS](https://2gc.ru/en/download) //under development
 <div id="header">
   <img src="https://pub-a89b5697d4074daeb851dc6c011ed225.r2.dev/2gc_app_list.svg" width="300"/>
 </div>
