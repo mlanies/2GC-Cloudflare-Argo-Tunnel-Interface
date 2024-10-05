@@ -18,7 +18,7 @@
 7. Запустите команду.
 
 <div id="header">
-  <img src="https://developers.cloudflare.com/_astro/connector.DgDJjokf_IrBTB.webp" width="400"/>
+  <img src="https://developers.cloudflare.com/_astro/connector.DgDJjokf_IrBTB.webp"/>
 </div>
 
 
