@@ -13,7 +13,7 @@
 # [2GC](https://2gc.ru)
 
 <p>
-    <a href="https://github.com/mlanies/2GC/blob/main/README_EN.md">English version</a>
+    <a href="https://github.com/mlanies/2GC/main/README_EN.md">English version</a>
 </p>
 
 
