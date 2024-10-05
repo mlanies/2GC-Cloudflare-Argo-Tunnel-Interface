@@ -31,7 +31,7 @@
 - Window 10 и выше
 - Интернет 10мб и выше
 
-### Функции [2GC FREE](https://2gc.ru/#DOWNLOADS)
+### Функции [2GC FREE](https://2gc.ru/download)
 
 - ✅ Подключение RDP
 - ❌ Подключение SSH
@@ -43,7 +43,7 @@
 - ❌ Единый вход (SSO) 
 - ❌ Файрвол веб-приложений (WAF)
 
-### Функции [2GC BUSINESS](https://2gc.ru/#DOWNLOADS) //на стадии разработки
+### Функции [2GC BUSINESS](https://2gc.ru/download) //на стадии разработки
 <div id="header">
   <img src="https://pub-a89b5697d4074daeb851dc6c011ed225.r2.dev/2gc_app_list.svg" width="300"/>
 </div>
