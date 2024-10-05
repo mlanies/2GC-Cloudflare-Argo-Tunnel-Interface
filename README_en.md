@@ -12,7 +12,7 @@
 
 # [2GC](https://2gc.ru/en)
 <p>
-    <a href="README_en.md">Русская версия</a>
+    <a href="README.md">Русская версия</a>
 </p>
 
 
