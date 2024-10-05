@@ -13,7 +13,7 @@
 # [2GC](https://2gc.ru)
 
 <p>
-    <a href="README_EN.md">English version</a>
+    <a href="README_en.md">English version</a>
 </p>
 
 
