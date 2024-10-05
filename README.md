@@ -3,7 +3,7 @@
 </div>
 
 <div id="badges" align="center">
-  <img src="https://img.shields.io/website?url=2gc.ru" alt="2GC site"/>
+![Website](https://img.shields.io/website?url=2gc.ru)
 </div>
 
 # [2GC](https://2gc.ru)
