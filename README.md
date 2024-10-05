@@ -3,7 +3,9 @@
 </div>
 
 <div id="badges" align="center">
-    <img src="https://img.shields.io/website?url=https%3A%2F%2F2gc.ru"alt="LinkedIn Badge"/>
+    <a href="https://2gc.ru" target="_blank">
+        <img src="https://img.shields.io/badge/website-000000?style=for-the-badge&logo=About.me&logoColor=white" alt="2GC"/>
+    </a>
 </div>
 
 # [2GC](https://2gc.ru)
