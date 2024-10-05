@@ -1,6 +1,7 @@
-<img src="(https://pub-a89b5697d4074daeb851dc6c011ed225.r2.dev/2gc_app_list.svg)" width="200"/>
+<div id="header" align="center">
+  <img src="https://pub-a89b5697d4074daeb851dc6c011ed225.r2.dev/2gc_app_list.svg" width="100"/>
+</div>
 
-![img]([https://pub-39c0bfd961854a87ad355d11701329e5.r2.dev/2gc-cf.png](https://pub-a89b5697d4074daeb851dc6c011ed225.r2.dev/2gc_app_list.svg))
 <div id="badges">
   <img src="https://img.shields.io/badge/LinkedIn-blue?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn Badge"/>
   <img src="https://img.shields.io/badge/YouTube-red?style=for-the-badge&logo=youtube&logoColor=white" alt="Youtube Badge"/>
