@@ -1,5 +1,5 @@
 <div id="header" align="center">
-  <img src="https://pub-a89b5697d4074daeb851dc6c011ed225.r2.dev/2gc_app_list.svg" width="100"/>
+  <img src="https://pub-a89b5697d4074daeb851dc6c011ed225.r2.dev/2gc_app_list.svg" width="300"/>
 </div>
 
 <div id="badges">
