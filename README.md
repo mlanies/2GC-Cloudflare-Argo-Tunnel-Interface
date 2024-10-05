@@ -4,7 +4,7 @@
 
 <div id="badges" align="center">
     <a href="https://2gc.ru" target="_blank">
-        <img src="https://img.shields.io/badge/website-000000?style=for-the-badge&logo=About.me&logoColor=white" alt="2GC"/>
+        <img src="https://img.shields.io/badge/website-000000?style=for-the-badge&logo=2GC&logoColor=white" alt="2GC"/>
     </a>
 </div>
 
