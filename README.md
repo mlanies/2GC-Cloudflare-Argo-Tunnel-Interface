@@ -1,8 +1,8 @@
+<div id="header" align="center">
+        <img src="https://pub-a89b5697d4074daeb851dc6c011ed225.r2.dev/2gc_logo.ico" alt="2GC Logo"">
+</div>
 <div id="badges" align="center">
     <a href="https://2gc.ru" target="_blank">
-        <!-- Логотип -->
-        <img src="https://pub-a89b5697d4074daeb851dc6c011ed225.r2.dev/2gc_logo.ico" alt="2GC Logo" width="30" height="30" style="vertical-align: middle;">
-        <!-- Кнопка с текстом -->
         <img src="https://img.shields.io/badge/website-000000?style=for-the-badge&logoColor=white" alt="2GC"/>
     </a>
     <a href="https://t.me/suppport2gc_bot" target="_blank">
