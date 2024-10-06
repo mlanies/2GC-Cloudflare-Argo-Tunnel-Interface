@@ -1,8 +1,8 @@
+<div id="header" align="center">
+        <img src="https://pub-a89b5697d4074daeb851dc6c011ed225.r2.dev/2gc_logo.ico" alt="2GC Logo"">
+</div>
 <div id="badges" align="center">
     <a href="https://2gc.ru/en" target="_blank">
-        <!-- Logo -->
-        <img src="https://pub-a89b5697d4074daeb851dc6c011ed225.r2.dev/2gc_logo.ico" alt="2GC Logo" width="30" height="30" style="vertical-align: middle;">
-        <!-- Button with text -->
         <img src="https://img.shields.io/badge/website-000000?style=for-the-badge&logoColor=white" alt="2GC"/>
     </a>
     <a href="https://t.me/suppport2gc_bot" target="_blank">
@@ -11,11 +11,10 @@
 </div>
 
 # [2GC](https://2gc.ru/en)
+
 <p>
-    <a href="README.md">Русская версия</a>
+    <a href="README.md">Russian version</a>
 </p>
-
-
 
 **2GC** is a convenient application for launching an encrypted **Argo Tunnel** channel, a reverse proxy server via **Cloudflare**.
 
@@ -29,36 +28,32 @@
 
 **Requirements**
 - Windows 10 or higher
-- Internet connection of 10 Mbps or higher
+- Internet speed of 10 Mbps or higher
 
-### Features of [2GC FREE](https://2gc.ru/en/download)
+### Features of [2GC FREE RDP](https://2gc.ru/en/download)
+For connecting to a remote desktop via Cloudflare Argo Tunnel.
+To use 2GC FREE RDP, you need to obtain your tunnel address. <a href="doc_en.md">Documentation on how to do this</a>
 
-- ✅ RDP Connection
-- ❌ SSH Connection
-- ❌ SMB Connection
-- ❌ TCP Connection
-- ❌ Login and password saving
-- ❌ User management
-- ❌ List of servers and services
-- ❌ Single Sign-On (SSO)
-- ❌ Web Application Firewall (WAF)
+### Features of [2GC FREE SSH](https://2gc.ru/en/download)
+For connecting to the SSH port via Cloudflare Argo Tunnel.
+To use 2GC FREE SSH, you need to obtain your tunnel address. <a href="doc_en.md">Documentation on how to do this</a>
 
 ### Features of [2GC BUSINESS](https://2gc.ru/en/download) //under development
 <div id="header">
   <img src="https://pub-a89b5697d4074daeb851dc6c011ed225.r2.dev/2gc_app_list.svg" width="300"/>
 </div>
 
+### Capabilities:
 - ✅ RDP Connection
 - ✅ SSH Connection
-- ✅ SMB Connection
-- ✅ TCP Connection
+- ✅ Connection to any TCP port
 - ✅ Login and password saving (encryption)
+
+### <a href="https://lk.2gc.ru">2GC Personal Dashboard</a>
+<div id="header">
+  <img src="https://pub-a89b5697d4074daeb851dc6c011ed225.r2.dev/lk_2gc.png"/>
+</div>
+
 - ✅ User management
 - ✅ List of servers and services
-- ✅ Single Sign-On (SSO)
-- ✅ Web Application Firewall (WAF)
-
-### Known Issues
-- In Windows 10 versions below 22H2, the 2GC application does not stay on top of other windows.
-- Conflict with the Sberbank Client USB key.
-- Passing through and addressing the digital signature (ECP) takes a long time. It is recommended to insert a USB flash drive into the connected server.
+- ✅ Access group management
