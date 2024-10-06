@@ -42,7 +42,7 @@
 
 
 ### [2GC FREE SSH](https://2gc.ru/download)
-Для подключения к порту shh через Cloudflare Argo tunnel.
+Для подключения к порту ssh через Cloudflare Argo tunnel.
 Чтобы ипользовать 2GC FREE SSH вам нужно получить адрес вашего туннеля. <a href="doc_ru.md">Документация как это сделать </a>
 
 
