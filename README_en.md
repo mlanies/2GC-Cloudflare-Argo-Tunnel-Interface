@@ -8,6 +8,9 @@
     <a href="https://t.me/suppport2gc_bot" target="_blank">
         <img src="https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white" alt="Telegram Bot"/>
     </a>
+    <a href="https://t.me/suppport2gc_bot" target="_blank">
+        <img src="https://img.shields.io/github/license/mlanies/2GC" alt="License"/>
+    </a>
 </div>
 
 # [2GC](https://2gc.ru/en)
