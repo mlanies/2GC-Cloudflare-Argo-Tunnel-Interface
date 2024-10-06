@@ -56,7 +56,7 @@
 
 
 
-## <a href="doc_ru.md">Личный кабинет 2GC</a>
+## <a href="doc_ru.md">Личный кабинет 2GC для программы 2GC BUSINESS</a>
 <div id="header">
   <img src="https://pub-a89b5697d4074daeb851dc6c011ed225.r2.dev/lk_2gc.png"/>
 </div>
