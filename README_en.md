@@ -52,7 +52,7 @@ To use 2GC FREE SSH, you need to obtain your tunnel address. <a href="doc_en.md"
 - ✅ Login and password saving (encryption)
 
 
-## <a href="https://lk.2gc.ru">2GC Personal Dashboard</a>
+## <a href="https://lk.2gc.ru">2GC Personal Dashboard for the 2GC BUSINESS program/a>
 <div id="header">
   <img src="https://pub-a89b5697d4074daeb851dc6c011ed225.r2.dev/lk_2gc.png"/>
 </div>
