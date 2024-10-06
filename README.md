@@ -31,17 +31,17 @@
 - Window 10 и выше
 - Интернет 10мб и выше
 
-### Функции [2GC FREE RDP](https://2gc.ru/download)
+### [2GC FREE RDP](https://2gc.ru/download)
 Для подключения к удаленному рабочему столу через Cloudflare Argo tunnel.
 Чтобы ипользовать 2GC FREE RDP вам нужно получить адрес вашего туннеля. <a href="doc_ru.md">Документация как это сделать </a>
 
 
-### Функции [2GC FREE SSH](https://2gc.ru/download)
+### [2GC FREE SSH](https://2gc.ru/download)
 Для подключения к порту shh через Cloudflare Argo tunnel.
 Чтобы ипользовать 2GC FREE SSH вам нужно получить адрес вашего туннеля. <a href="doc_ru.md">Документация как это сделать </a>
 
 
-### Функции [2GC BUSINESS](https://2gc.ru/download) //на стадии разработки
+### [2GC BUSINESS](https://2gc.ru/download) //на стадии разработки
 <div id="header">
   <img src="https://pub-a89b5697d4074daeb851dc6c011ed225.r2.dev/2gc_app_list.svg" width="300"/>
 </div>
