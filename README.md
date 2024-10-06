@@ -80,3 +80,7 @@
 <a href="https://github.com/mlanies/2GC/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=mlanies/2GC" alt="Contributors" />
 </a>
+
+## License
+
+Published under the [MIT License](./LICENCE).
