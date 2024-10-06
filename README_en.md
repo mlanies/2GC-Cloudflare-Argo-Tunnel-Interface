@@ -30,6 +30,8 @@
 - Windows 10 or higher
 - Internet speed of 10 Mbps or higher
 
+## App
+
 ### [2GC FREE RDP](https://2gc.ru/en/download)
 For connecting to a remote desktop via Cloudflare Argo Tunnel.
 To use 2GC FREE RDP, you need to obtain your tunnel address. <a href="doc_en.md">Documentation on how to do this</a>
