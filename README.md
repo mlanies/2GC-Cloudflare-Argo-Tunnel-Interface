@@ -73,3 +73,10 @@
 ### Известные проблемы
 - Конфликт с USB ключём банк-клиента Сбербанк
 - Проброс и обращение к ЭЦП занимает продолжительное время. Рекомендуется установить USB флешку на подключаемый сервер
+
+
+## Авторы
+
+<a href="https://github.com/mlanies/2GC/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=mlanies/2GC" alt="Contributors" />
+</a>
