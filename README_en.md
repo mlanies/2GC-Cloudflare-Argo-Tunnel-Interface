@@ -64,7 +64,7 @@ To use 2GC FREE SSH, you need to obtain your tunnel address. <a href="doc_en.md"
 - ✅ List of servers and services
 - ✅ Access group management
 
-## Авторы
+## Contributors
 
 <a href="https://github.com/mlanies/2GC/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=mlanies/2GC" alt="Contributors" />
