@@ -43,7 +43,7 @@ To use 2GC FREE RDP, you need to obtain your tunnel address. <a href="doc_en.md"
 For connecting to the SSH port via Cloudflare Argo Tunnel.
 To use 2GC FREE SSH, you need to obtain your tunnel address. <a href="doc_en.md">Documentation on how to do this</a>
 
-### [2GC BUSINESS](https://2gc.ru/en/download) //under development
+### [2GC BUSINESS](https://2gc.ru/en/download) 
 <div id="header">
   <img src="https://pub-a89b5697d4074daeb851dc6c011ed225.r2.dev/2gc_app_list.svg" width="300"/>
 </div>
